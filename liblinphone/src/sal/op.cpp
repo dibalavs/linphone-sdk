@@ -22,8 +22,14 @@
 
 #include <cstring>
 
+#include "address/address.h"
 #include "bellesip_sal/sal_impl.h"
 #include "c-wrapper/internal/c-tools.h"
+
+#include "bctoolbox/charconv.h"
+#include "bctoolbox/defs.h"
+#include "bctoolbox/port.h"
+#include "bctoolbox/vfs_encrypted.hh"
 
 using namespace std;
 
@@ -692,8 +698,38 @@ int SalOp::sendRequestAndCreateRefresher(belle_sip_request_t *request,
 
 belle_sip_header_contact_t *SalOp::createContact(bool forceSipInstance) {
 	belle_sip_header_contact_t *contactHeader = nullptr;
+	std::shared_ptr<Address> addr;
+	std::string pn_prid;
 	if (getContactAddress()) {
-		contactHeader = belle_sip_header_contact_create(BELLE_SIP_HEADER_ADDRESS(getContactAddress()));
+
+		const auto salAddr = getContactAddress();
+		if (salAddr) {
+			addr = (new Address())->toSharedPtr();
+			addr->setImpl(salAddr);
+		}
+
+		pn_prid = addr->getUriParamValue("pn-prid");
+		lInfo() << "uri param: pn-prid===" << pn_prid;
+		//addr->removeUriParam("pn-prid");
+		addr->removeUriParam("pn-provider");
+		addr->removeUriParam("pn-param");
+		addr->removeUriParam("pn-silent");
+		addr->removeUriParam("pn-timeout");
+		// if (pn_prid.size() != 0) {
+		// 	size_t b64Size = 0;
+		// 	bctbx_base64_encode(nullptr, &b64Size, (const unsigned char*)pn_prid.c_str(), pn_prid.size());
+		// 	unsigned char *base64Buffer = (unsigned char *)bctbx_malloc(b64Size + 1);
+		// 	bctbx_base64_encode(base64Buffer, &b64Size, (const unsigned char*)pn_prid.c_str(), pn_prid.size());
+		// 	base64Buffer[b64Size] = '\0';
+		// 	base64Buffer[b64Size - 1] = '\0';
+		// 	base64Buffer[b64Size - 2] = '\0';
+		// 	addr->setUriParam("pn-prid", (const char*)base64Buffer);
+		// 	// belle_sip_parameters_set_parameter(BELLE_SIP_PARAMETERS(contactHeader), "pn-prid",
+		// 	// 									(const char*)base64Buffer);
+		// 	bctbx_free(base64Buffer);
+		// }
+
+		contactHeader = belle_sip_header_contact_create(BELLE_SIP_HEADER_ADDRESS(addr->getImpl()));
 	} else {
 		contactHeader = belle_sip_header_contact_new();
 	}
@@ -715,23 +751,24 @@ belle_sip_header_contact_t *SalOp::createContact(bool forceSipInstance) {
 	if (!hasGruuContact) belle_sip_header_contact_set_automatic(contactHeader, mRoot->mAutoContacts);
 
 	/* Add +sip.instance */
-	if (forceSipInstance || hasGruuContact) {
-		if (!mRoot->mUuid.empty() &&
-		    !belle_sip_parameters_has_parameter(BELLE_SIP_PARAMETERS(contactHeader), "+sip.instance")) {
-			stringstream ss;
-			ss << "\"<urn:uuid:" << mRoot->mUuid << ">\"";
-			string instanceId = ss.str();
-			belle_sip_parameters_set_parameter(BELLE_SIP_PARAMETERS(contactHeader), "+sip.instance",
-			                                   instanceId.c_str());
-		}
-	}
-	if (!mRoot->mLinphoneSpecs.empty() &&
-	    !belle_sip_parameters_has_parameter(BELLE_SIP_PARAMETERS(contactHeader), "+org.linphone.specs")) {
-		stringstream ss;
-		ss << "\"" << mRoot->mLinphoneSpecs << "\"";
-		string specs = ss.str();
-		belle_sip_parameters_set_parameter(BELLE_SIP_PARAMETERS(contactHeader), "+org.linphone.specs", specs.c_str());
-	}
+	/// HACK: I do not need some extra properties. Asterisk complains about big size of "Contact:" field
+	// if (forceSipInstance || hasGruuContact) {
+	// 	if (!mRoot->mUuid.empty() &&
+	// 	    !belle_sip_parameters_has_parameter(BELLE_SIP_PARAMETERS(contactHeader), "+sip.instance")) {
+	// 		stringstream ss;
+	// 		ss << "\"<urn:uuid:" << mRoot->mUuid << ">\"";
+	// 		string instanceId = ss.str();
+	// 		belle_sip_parameters_set_parameter(BELLE_SIP_PARAMETERS(contactHeader), "+sip.instance",
+	// 		                                   instanceId.c_str());
+	// 	}
+	// }
+	// if (!mRoot->mLinphoneSpecs.empty() &&
+	//     !belle_sip_parameters_has_parameter(BELLE_SIP_PARAMETERS(contactHeader), "+org.linphone.specs")) {
+	// 	stringstream ss;
+	// 	ss << "\"" << mRoot->mLinphoneSpecs << "\"";
+	// 	string specs = ss.str();
+	// 	belle_sip_parameters_set_parameter(BELLE_SIP_PARAMETERS(contactHeader), "+org.linphone.specs", specs.c_str());
+	// }
 	return contactHeader;
 }
 

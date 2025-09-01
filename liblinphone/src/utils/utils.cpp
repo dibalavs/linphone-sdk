@@ -24,6 +24,7 @@
 #include <list>
 #include <sstream>
 
+#include "bctoolbox/crypto.h"
 #include "bctoolbox/charconv.h"
 #include "bctoolbox/defs.h"
 #include "bctoolbox/port.h"

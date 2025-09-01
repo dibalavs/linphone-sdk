@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.0'
+        classpath 'com.android.tools.build:gradle:8.2.1'
     }
 }
 
@@ -55,7 +55,7 @@ javaExcludes.add('**/mediastream/MediastreamerActivity.java')
 def pluginsList = ""
 
 task listPlugins() {
-    fileTree(pluginsDir).visit { FileVisitDetails details -> 
+    fileTree(pluginsDir).visit { FileVisitDetails details ->
         println("Found plugin: " + details.file.name)
         pluginsList = pluginsList + "\"" + details.file.name  + "\","
     }
@@ -72,7 +72,7 @@ android {
     }
 
     compileSdkVersion 34
-    
+
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 34
@@ -144,32 +144,32 @@ android {
 
 ///////////// Task /////////////
 
-task(generateJavadoc, type: Javadoc) {
-    mustRunAfter 'generateDebugRFile', 'generateReleaseRFile'
-    source = srcDir
-    excludes = javaExcludes.plus(['**/**.html', '**/**.aidl', '**/org/linphone/core/tools/**'])
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    classpath += configurations.javadocDeps
-    options.encoding = 'UTF-8'
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.setOverview(rootSdk + '/share/linphonej/java/src/main/javadoc/overview.html')
+//task(generateJavadoc, type: Javadoc) {
+///    mustRunAfter 'generateDebugRFile', 'generateReleaseRFile'
+///    source = srcDir
+///    excludes = javaExcludes.plus(['**/**.html', '**/**.aidl', '**/org/linphone/core/tools/**'])
+///    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+///    classpath += configurations.javadocDeps
+///    options.encoding = 'UTF-8'
+///    options.addStringOption('Xdoclint:none', '-quiet')
+///    options.setOverview(rootSdk + '/share/linphonej/java/src/main/javadoc/overview.html')
 
-    afterEvaluate {
-        classpath += files(android.libraryVariants.collect { variant ->
-            variant.javaCompileProvider.get().classpath.files
-        })
-    }
-}
+///    afterEvaluate {
+///        classpath += files(android.libraryVariants.collect { variant ->
+///            variant.javaCompileProvider.get().classpath.files
+///        })
+///    }
+///}
 
-task androidJavadocsJar(type: Jar, dependsOn: generateJavadoc) {
-    archiveClassifier = 'javadoc'
-    from generateJavadoc.destinationDir
-}
+///task androidJavadocsJar(type: Jar, dependsOn: generateJavadoc) {
+///    archiveClassifier = 'javadoc'
+///   from generateJavadoc.destinationDir
+///}
 
 task sourcesJar(type: Jar) {
     archiveClassifier = 'sources'
     from android.sourceSets.main.java.srcDirs
-    finalizedBy androidJavadocsJar
+    //finalizedBy androidJavadocsJar
 }
 
 task sdkZip(type: Zip) {
@@ -230,5 +230,5 @@ afterEvaluate {
         doLast {
             debugFile.renameTo("$buildDir/outputs/aar/linphone-sdk-android-release.aar")
         }
-    }    
+    }
 }

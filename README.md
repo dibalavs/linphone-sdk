@@ -1,5 +1,27 @@
 [![pipeline status](https://gitlab.linphone.org/BC/public/linphone-sdk/badges/master/pipeline.svg)](https://gitlab.linphone.org/BC/public/linphone-sdk/commits/master)
 
+> [!WARNING]
+> This repository is not what are you looking for!
+
+This repository contains hacks to remove next parameters from contact URI:
+
+- "pn-provider"
+- "pn-param"
+- "pn-silent"
+- "pn-timeout"
+
+This is becase asterisk has compile-time constratint about length of part URI in "Contact" field. And I need to remove unused extra parameters
+
+To configure project, launch script:
+```bash
+configure_cmake.sh
+```
+
+To build project, launch script:
+```build
+build_cmake.sh
+```
+
 # Linphone-SDK
 
 Linphone-SDK is a project that bundles Liblinphone and its dependencies as git submodules, in the purpose of simplifying
@@ -69,7 +91,7 @@ In this order, add `C:\msys64\mingw<N>\bin`, `C:\msys64\` and `C:\msys64\usr\bin
 
 Visual Studio must also be properly configured with addons. Under "Tools"->"Obtain tools and features", make sure that the following components are installed:
  - Tasks: Select Windows Universal Platform development, Desktop C++ Development, .NET Development
- 
+
 For Visual Studio 2022 :
  - Under "Installation details". Go to "Desktop C++ Development" and add "SDK Windows 8.1 and SDK UCRT"
  - Individual component: Windows 8.1 SDK
@@ -113,7 +135,7 @@ In this case, you will need to choose the build configuration in the first step,
 
 Requirement:
  - Xcode >= 15
- 
+
 Sample configuration for arm64 targeting iPhone only in Debug mode:
 
 `cmake --preset=ios-sdk -G Xcode -B build-ios -DLINPHONESDK_IOS_PLATFORM=Iphone -DLINPHONESDK_IOS_ARCHS="arm64"`
@@ -242,7 +264,7 @@ See the [`cmake/NuGet`](cmake/NuGet/README.md) folder for build instructions.
 
 ### Python wrapper & wheel packaging
 
-To build the python wrapper, you first need to install `cython` tool using pip. If you want to build the documentation, also install `pdoc` tool. 
+To build the python wrapper, you first need to install `cython` tool using pip. If you want to build the documentation, also install `pdoc` tool.
 Finally install `wheel` tool to be able to build a .whl package.
 Minimal python version to build wrapper is `3.10`
 
@@ -319,7 +341,7 @@ Note that SPM on MacOS requires FAT_BINARY option to be turned off.
 
 Example iOS: cmake --preset=ios-sdk -G Ninja -B spm-ios && cmake --build spm-ios -> will build a SPM under  spm-ios/linphone-sdk-swift-ios
 Example MacOS: cmake --preset=mac-sdk -G Ninja -B spm-macos -DENABLE_FAT_BINARY=NO &&  cmake --build spm-macos  -> will build a SPM under spm-macos/linphone-sdk-swift-macos
-Note that it might be necessary to do the following steps if the app builds but immediately stops not finding a framework :  
+Note that it might be necessary to do the following steps if the app builds but immediately stops not finding a framework :
 Open the "Build Settings" tab
 Search for "Runpath Search Paths" (LD_RUNPATH_SEARCH_PATHS)
 Ensure it contains:

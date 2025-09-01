@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.0'
+        classpath 'com.android.tools.build:gradle:8.2.1'
     }
 }
 
@@ -50,7 +50,7 @@ publishing {
             version "@LINPHONESDK_VERSION@"
             artifact("$buildDir/outputs/aar/linphone-sdk-android-debug.aar")
             artifact source: "$buildDir/libs/linphone-sdk-android-sources.jar", classifier: 'sources', extension: 'jar'
-            artifact source: "$buildDir/libs/linphone-sdk-android-javadoc.jar", classifier: 'javadoc', extension: 'jar'
+            //artifact source: "$buildDir/libs/linphone-sdk-android-javadoc.jar", classifier: 'javadoc', extension: 'jar'
             artifact source: "$buildDir/distributions/linphone-sdk-android-libs-debug.zip", classifier: 'libs-debug', extension: 'zip'
 
             pom {
@@ -76,7 +76,7 @@ publishing {
             version "@LINPHONESDK_VERSION@"
             artifact("$buildDir/outputs/aar/linphone-sdk-android-release.aar")
             artifact source: "$buildDir/libs/linphone-sdk-android-sources.jar", classifier: 'sources', extension: 'jar'
-            artifact source: "$buildDir/libs/linphone-sdk-android-javadoc.jar", classifier: 'javadoc', extension: 'jar'
+            //artifact source: "$buildDir/libs/linphone-sdk-android-javadoc.jar", classifier: 'javadoc', extension: 'jar'
             artifact source: "$buildDir/distributions/linphone-sdk-android-libs-debug.zip", classifier: 'libs-debug', extension: 'zip'
 
             pom {
@@ -96,7 +96,7 @@ publishing {
             }
         }
     }
-    
+
     repositories {
         maven {
             url "./maven_repository/"
